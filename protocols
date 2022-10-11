@@ -1,0 +1,290 @@
+Protocols for study of
+Trans-ancestry genome-wide association meta-analyses of hippocampal and subfield volumes
+Nana Liu1,40, Longjiang Zhang2,40, Tian Tian3,40, Jingliang Cheng4, Bing Zhang5, Shijun Qiu6, Zuojun Geng7, Guangbin Cui8, Quan Zhang9, Weihua Liao10,11,12, Yongqiang Yu13, Hui Zhang14, Bo Gao15,16, Xiaojun Xu17, Tong Han18, Zhenwei Yao19, Wen Qin1, Feng Liu1, Meng Liang20, Qiang Xu1, Jilian Fu1, Jiayuan Xu1, Wenzhen Zhu3, Peng Zhang21, Wei Li21, Dapeng Shi22, Caihong Wang4, Su Lui23, Zhihan Yan24, Feng Chen25, Jiance Li26, Jing Zhang27,28, Dawei Wang29, Wen Shen30, Yanwei Miao31, Junfang Xian32, Jia-Hong Gao33, Xiaochu Zhang34, Mulin Jun Li35, Kai Xu36, Xi-Nian Zuo37,38, Meiyun Wang22*, Zhaoxiang Ye21*, Chunshui Yu1,39* and the CHIMGEN# Consortia
+1Department of Radiology and Tianjin Key Laboratory of Functional Imaging, Tianjin Medical University General Hospital, 300052 Tianjin, China
+2Department of Medical Imaging, Jinling Hospital, Medical School of Nanjing University, 210002 Nanjing, China
+3Department of Radiology, Tongji Hospital, Tongji Medical College, Huazhong University of Science and Technology, 430030 Wuhan, China
+4Department of Magnetic Resonance Imaging, The First Affiliated Hospital of Zhengzhou University, 450052 Zhengzhou, China
+5Department of Radiology, Drum Tower Hospital, Medical School of Nanjing University, 210008 Nanjing, China
+6Department of Medical Imaging, The First Affiliated Hospital of Guangzhou University of Traditional Chinese Medicine, 510405 Guangzhou, China
+7Department of Medical Imaging, The Second Hospital of Hebei Medical University, 050000 Shijiazhuang, China
+8Functional and Molecular Imaging Key Lab of Shaanxi Province & Department of Radiology, Tangdu Hospital, Air Force Medical University, 710038 Xi'an, China
+9Department of Radiology, Characteristic Medical Center of Chinese People's Armed Police Force, 300162 Tianjin, China
+10Department of Radiology, Xiangya Hospital, Central South University, 410008 Changsha, China
+11Molecular Imaging Research Center of Central South University, 410008 Changsha, China
+12National Clinical Research Center for Geriatric Disorders, Xiangya Hospital, Central South University, 410008 Changsha, China
+13Department of Radiology, The First Affiliated Hospital of Anhui Medical University, 230022 Hefei, China
+14Department of Radiology, The First Hospital of Shanxi Medical University, 030001 Taiyuan, China
+15Department of Radiology, The Affiliated Hospital of Guizhou Medical University, 550004 Guiyang, China
+16Department of Radiology, Yantai Yuhuangding Hospital, 264000 Yantai, China
+17Department of Radiology, The Second Affiliated Hospital of Zhejiang University, School of Medicine, 310009 Hangzhou, China
+18Department of Radiology, Tianjin Huanhu Hospital, 300350 Tianjin, China
+19Department of Radiology, Huashan Hospital, Fudan University, 200040 Shanghai, China
+20School of Medical Imaging and Tianjin Key Laboratory of Functional Imaging, Tianjin Medical University, 300203 Tianjin, China
+21Department of Radiology, Tianjin Medical University Cancer Institute and Hospital, 300060 Tianjin, China
+22Department of Radiology, Henan Provincial People's Hospital & Zhengzhou University People's Hospital, 450003 Zhengzhou, China
+23Department of Radiology, the Center for Medical Imaging, West China Hospital of Sichuan University, 610041 Chengdu, China
+24Department of Radiology, The Second Affiliated Hospital and Yuying Children's Hospital of Wenzhou Medical University, 325027 Wenzhou, China
+25Department of Radiology, Hainan General Hospital (Hainan Affiliated Hospital of Hainan Medical University), 570311 Haikou, China
+26Department of Radiology, The First Affiliated Hospital of Wenzhou Medical University, 325000 Wenzhou, China
+27Department of Magnetic Resonance, Lanzhou University Second Hospital, 730030 Lanzhou, China
+28Gansu Province Clinical Research Center for Functional and Molecular Imaging, 730030 Lanzhou, China
+29Department of Radiology, Qilu Hospital of Shandong University, 250012 Jinan, China
+30Department of Radiology, Tianjin First Center Hospital, 300192 Tianjin, China
+31Department of Radiology, The First Affiliated Hospital of Dalian Medical University, 116011 Dalian, China
+32Department of Radiology, Beijing Tongren Hospital, Capital Medical University, 100730 Beijing, China
+33Center for MRI Research, Academy for Advanced Interdisciplinary Studies, Peking University, 100871 Beijing, China
+34Division of Life Science and Medicine, University of Science & Technology of China, 230027 Hefei, China
+35Department of Bioinformatics, The Province and Ministry Co-sponsored Collaborative Innovation Center for Medical Epigenetics, School of Basic Medical Sciences, Tianjin Medical University, 300070 Tianjin, China.
+36Department of Radiology, The Affiliated Hospital of Xuzhou Medical University, 221006 Xuzhou, China
+37IDG/McGovern Institute for Brain Research, Beijing Normal University, 100875 Beijing, China
+38Institute of Psychology, Chinese Academy of Sciences, 100101 Beijing, China
+39CAS Center for Excellence in Brain Science and Intelligence Technology, Chinese Academy of Sciences, 200031 Shanghai, China
+40These authors contributed equally to this work: Nana Liu, Longjiang Zhang, Tian Tian
+#A list of authors and their affiliations appears at the end of the manuscript.
+*Correspondence to: 
+Chunshui Yu, e-mail: chunshuiyu@tmu.edu.cn
+Zhaoxiang Ye, e-mail: yezhaoxiang@163.com 
+Meiyun Wang, e-mail: mywang@ha.edu.cn
+
+ 
+Step1: Genotype quality control (QC)
+Tools: PLINK1 (http://zzz.bwh.harvard.edu/plink/) 
+	Pre-imputation QC:
+The variant-level QC：
+Variants call rate < 95%
+Minor allele frequency (MAF) < 0.001
+Hardy-Weinberg equilibrium (HWE) P < 1 × 10-6
+plink --bfile ${genotype_data} --geno 0.05 --maf 0.001 --hwe 1e-6 --make-bed --out ${output}
+The sample-level QC:
+Sex concordance check
+plink --bfile ${genotype_data} --check-sex --out ${sexcheck}
+Identity check (IBD > 0.1875)
+plink --bfile ${genotype_data} --indep-pairwise 50 5 0.2 --out ${relatedness} 
+plink --bfile ${genotype_data} --extract ${relatedness.prune.in} --min 0.2 --genome --genome-full --out ${relatedness}
+Excess heterozygosity (> mean ± 5SD)
+plink --bfile ${genotype_data} --het --out ${homozygosity} 
+Calculate the observed heterozygosity rate per individual using the formula (N(NM) - O(Hom))/N(NM).
+Missing genotypes > 3%
+plink --bfile ${genotype_data} --missing --out ${missingness}
+Principal components analysis (PCA)
+We removed the genomic regions with long-range LD (e.g. MHC region)2,3, which was listed on the website (https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD)).
+plink --bfile ${genotype_data} --exclude high-LD-regions.txt --range --make-bed --out ${genotype_data_rm_high-LD}
+plink --bfile ${genotype_data_rm_high-LD} --indep-pairwise 1000 80 0.1 --out ${genotype_data_rm_high-LD}
+plink --bfile ${genotype_data_rm_high-LD} --extract genotype_data_rm_high-LD.prune.in --make-bed --out ${genotype_data_prune}
+plink --bfile ${genotype_data_prune} --pca --out ${genotype_data_prune_pca}
+
+	Imputation
+Tools: 
+SHAPEIT24 (https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.html)
+IMPUTE25 (http://mathgen.stats.ox.ac.uk/impute/impute_v2.html)
+Reference panel: 1000 Genomes (1KG)6 and SG10K7 projects
+Shapeit
+Shapeit --input-bed chr${chromosome}.bed chr${chromosome}.bim chr${chromosome}.fam --input-ref ${hapFile} ${legendFile} ${sampleFile} --exclude-snp ${excludeFile} --input-map ${mapFile} -O chr${chromosome}.phased --thread 4 --force
+Imputation
+impute2 -use_prephased_g -known_haps_g chr${chromosome}.phased.haps -m ${mapFile} -h ${hapFile} -l ${legendFile} -int $chunkStart $chunkEnd -Ne 20000 -o chr${chromosome}-${chunkStart}-${chunkEnd}.imputed
+
+	After-imputation QC
+Sorting SNPs with following criterias from the snp-stats file generated by IMPUTE2:
+MAF ≥ 0.01
+Information score (INFO) ≥ 0.9
+
+Step2: MRI data processing
+	Hippocampal and subfield volumes segmentation
+Tools: FreeSurfer v7.08 (https://surfer.nmr.mgh.harvard.edu/)
+recon-all -all -s ${SUBJECT}
+segmentHA_T1.sh ${SUBJECT} ${SUBJECTS_DIR}
+	Median absolute deviation was calculated with Python (robust.mad)
+	Harmonization
+Tools: ComBat harmonization9
+function HAdata=harmonization_ROI(data,batch,covariates,method)
+fprintf('--------HAdata=harmonize multi-batches(centers) ROI data based on Combat---------\n');
+fprintf('Format: HAdata=harmonization_ROI(data,batch,covariates,method)\n');
+fprintf('--data:\tdata need harmonization (mandatory),canbe mat variable, or csv,xls or text file\n');
+fprintf('--batch:\tbatch (center) effects that need be removed(mandatory),vector or text file[Ndatas]\n');
+fprintf('--covariates:\tcovariates of Biological information that need preserved (optional),matrix or text file[Ncovariates,Nsample]\n');
+fprintf('--method;\tharmonization method (optional),''parametric''(default) or ''non-parametric''\n');
+fprintf('-------Written by QinWen 20200707--------\n');
+fprintf('This script depend on ''ComBatHarmonization''(by  Jfortin1) at github:\nhttps://github.com/Jfortin1/ComBatHarmonization/tree/master/Matlab\n');
+if nargin<1
+    data=spm_select(1,'any','Select a text(csv,xls,mat) data file needs harmonization:');
+end
+if nargin<2
+    batch=spm_select(1,'any','Select a text(mat) file defining the batch (center) effect:');
+end
+if nargin<3
+    covariates=spm_select(1,'any','Select a text(mat) file defining the Boilogical covariates:');
+end
+if nargin<4
+    method='parametric';
+end
+%check data
+if ischar(data)
+    if exist(data,'file')
+        data_is_file=1;
+        [outdir,filename,ext]=fileparts(data);
+        switch ext
+            case '.txt'
+                data=load(data);
+            case '.csv'
+                data=csvread(data);
+            case '.xls'
+                data=xlsread(data);
+            case '.xlsx'
+                data=xlsread(data);
+            otherwise
+                data=load(data);
+        end
+    else
+        error('no exist data file %n',data);
+    end
+end
+
+%check batch
+if exist(batch,'file')
+    batch=load(batch);
+    if isstruct(batch)
+        batch=struct2array(batch);
+    end
+elseif exist(batch,'1')
+    batch=batch;
+else
+    error('Bad format of batch \n');
+end
+%check covariates
+if exist(covariates,'file')
+    covariates=load(covariates);
+    if isstruct(covariates)
+        covariates=struct2array(covariates);
+    end
+end
+if isempty(covariates)
+covariates=[];
+end
+
+% maincode
+HAdata=harmonization_run(data,batch,covariates,'',method);
+if ~data_is_file
+    outpath=[pwd,filesep,'harmonized_data.mat'];
+else
+outpath=[outdir,filesep,'Ha_',filename,'.mat'];
+end
+    save(outpath,'HAdata','batch','covariates');
+	Gaussian transformation
+function outdata=gaussian_resmaple_Qin(data,outpath)
+if nargin<2
+    outdir=pwd;
+    outpath=[outdir,filesep,'gauss_data.mat'];
+end
+if nargin<1
+    fprintf('=========resample data into Gaussain distribution=========\nFormat: outdata=gaussian_resmaple(data,outpath)');
+    fprintf('\nInput\n --data: input data [nSample nFeature]\n');
+    fprintf(' --outpath: output filepath(*.mat)\nOutput\n --outdata: output data\n');
+    fprintf('-------Written by Qin Wen at 20190828------\n');
+    return;
+end
+msize=size(data);
+GS=randn(msize(1),1);
+zGS=sort(zscore(GS));
+resamp_data=[];
+for f =1:msize(2)
+    fdata=data(:,f);
+    [ofdata,ind]=sort(fdata);
+    GS_fdata(ind)=zGS;
+    resamp_data(:,f)=GS_fdata;
+end
+outdata.resamp_data=resamp_data;
+outdata.gauss_ref=zGS;
+save(outpath,'-struct','outdata')
+end
+
+Step3: GWAS of hippocampal and subfield volumes
+	For autosomes
+Tools: BGENIE v1.310,11 (https://jmarchini.org/bgenie/)
+bgenie_v1.3_static2 --bgen ${bgen_file} --pheno ${pheno_file} --covar ${covar_file} --pvals --out ${output_file}
+	For X chromosome
+Tools: PLINK(v.2.00)1 (http://zzz.bwh.harvard.edu/plink/) 
+plink2 --bfile ${genotype_data} --split-par 2699520 154931044 --make-bed --out ${output_file}
+plink2 --bfile ${genotype_data} --pheno ${pheno_file} --glm hide-covar sex --covar ${cov_file} --out ${output_file}
+Step4: Trans-ancestry meta-analysis
+Tools: METASOFT v.212 (http://genetics.cs.ucla.edu/meta/)
+python plink2metasoft.py ${output_file} ${GWAS summary statistics 1} ${GWAS summary statistics 2}
+java -jar Metasoft.jar -input ${input_file} -mvalue -output ${output_file}
+Step5: Plink clumping
+Tools: PLINK1 (http://zzz.bwh.harvard.edu/plink/) 
+plink \
+    --bfile ${genotype_data}\
+    --clump-p1 1.13e-9 \
+    --clump-p2 1.13e-9 \
+    --clump-r2 0.1 \
+    --clump-kb 3000 \
+    --clump ${GWAS summary statistics} \
+    --clump-snp-field RSID \
+    --clump-field P \
+--out ${output_file}
+
+Step6: Genomic control inflation factor (Lambda GC) and linkage disequilibrium score regression (LDSC) intercept
+Tools: LDSC13 (https://github.com/bulik/ldsc)
+Covariate-adjusted LD score regression14 (https://github.com/immunogenomics/cov-ldsc)
+python munge_sumstats.py --sumstats ${GWAS summary statistics} --out ${cleaned GWAS summary statistics}
+python ldsc.py --h2 ${cleaned GWAS summary statistics} --ref-ld-chr ${LDscore} --w-ld-chr ${LDscore} --out ${output_file}
+Step7: Statistical fine mapping
+Tools: PAINTOR15 (https://github.com/gkichaev/PAINTOR_V3.0/wiki)
+Calculate LD matrix:
+plink --bfile ${genotype_data} --extract ${locus_SNP} --a1-allele ${effect_allele} --r square --out ${output_file}
+Finemapping with mcmc model:
+PAINTOR -input {finemapping_list} -in ${input_dir} -Zhead Z -LDname ld -out ${output_dir} -mcmc -annotations Coding
+Finemapping with one causal assumption:
+PAINTOR -input ${finemapping_list} -in ${input_dir} -Zhead Z -LDname ld -out ${output_dir} -enumerate 1 -annotations Coding
+
+Step8: Polygenic score (PGS)
+Tools: PRSice v.2.3.5 software16 (https://www.prsice.info/)
+Rscript PRSice.R \
+--dir ${PRSice_dir} \
+--prsice PRSice_linux \
+--base ${base_data} \
+--ld ${genotype_data} \
+--type bgen \
+--target ${target_data} \
+--thread 1 \ 
+--stat BETA \
+--binary-target F \
+--pheno ${phenotype} \
+--pheno-col pheno \
+--cov ${cov_file} 
+--out ${output_file}
+
+Step9: Colocalization analysis
+Tools: Coloc 5.1.017 (https://chr1swallace.github.io/coloc/index.html)
+d1=list(beta=in_file$BETA1,varbeta=in_file$SE1*in_file$SE1,snp=in_file$RSID,position=in_file$POS, type="quant", N=sample_size1, MAF=in_file$MAF1)
+d2=list(beta=in_file$BETA2,varbeta=in_file$SE2*in_file$SE2,snp=in_file$RSID,position=in_file$POS, type="quant", N=sample_size2, MAF=in_file$MAF2)
+my.res <- coloc.abf(dataset1=d1, dataset2=d2)
+
+
+
+
+
+
+
+
+
+ 
+References:
+1.	Purcell, S. et al. PLINK: a tool set for whole-genome association and population-based linkage analyses. Am J Hum Genet 81, 559-75 (2007).
+2.	Price, A.L. et al. Long-range LD can confound genome scans in admixed populations. Am J Hum Genet 83, 132-5; author reply 135-9 (2008).
+3.	Anderson, C.A. et al. Data quality control in genetic case-control association studies. Nat Protoc 5, 1564-73 (2010).
+4.	Delaneau, O., Zagury, J.F. & Marchini, J. Improved whole-chromosome phasing for disease and population genetic studies. Nat Methods 10, 5-6 (2013).
+5.	Howie, B.N., Donnelly, P. & Marchini, J. A flexible and accurate genotype imputation method for the next generation of genome-wide association studies. PLoS Genet 5, e1000529 (2009).
+6.	Auton, A. et al. A global reference for human genetic variation. Nature 526, 68-74 (2015).
+7.	Wu, D. et al. Large-Scale Whole-Genome Sequencing of Three Diverse Asian Populations in Singapore. Cell 179, 736-749.e15 (2019).
+8.	Fischl, B. et al. Whole brain segmentation: automated labeling of neuroanatomical structures in the human brain. Neuron 33, 341-55 (2002).
+9.	Fortin, J.P. et al. Harmonization of multi-site diffusion tensor imaging data. Neuroimage 161, 149-170 (2017).
+10.	Bycroft, C. et al. The UK Biobank resource with deep phenotyping and genomic data. Nature 562, 203-209 (2018).
+11.	Elliott, L.T. et al. Genome-wide association studies of brain imaging phenotypes in UK Biobank. Nature 562, 210-216 (2018).
+12.	Han, B. & Eskin, E. Random-effects model aimed at discovering associations in meta-analysis of genome-wide association studies. Am J Hum Genet 88, 586-98 (2011).
+13.	Bulik-Sullivan, B.K. et al. LD Score regression distinguishes confounding from polygenicity in genome-wide association studies. Nat Genet 47, 291-5 (2015).
+14.	Luo, Y. et al. Estimating heritability and its enrichment in tissue-specific gene sets in admixed populations. Hum Mol Genet 30, 1521-1534 (2021).
+15.	Kichaev, G. & Pasaniuc, B. Leveraging Functional-Annotation Data in Trans-ethnic Fine-Mapping Studies. Am J Hum Genet 97, 260-71 (2015).
+16.	Choi, S.W. & O'Reilly, P.F. PRSice-2: Polygenic Risk Score software for biobank-scale data. Gigascience 8(2019).
+17.	Giambartolomei, C. et al. Bayesian test for colocalisation between pairs of genetic association studies using summary statistics. PLoS Genet 10, e1004383 (2014).
+
