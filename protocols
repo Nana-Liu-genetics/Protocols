@@ -189,13 +189,17 @@ python munge_sumstats.py --sumstats ${GWAS summary statistics} --out ${cleaned G
 python ldsc.py --h2 ${cleaned GWAS summary statistics} --ref-ld-chr ${LDscore} --w-ld-chr ${LDscore} --out ${output_file}
 
 Step7: Statistical fine mapping
-Tools: PAINTOR15 (https://github.com/gkichaev/PAINTOR_V3.0/wiki)
+Tools: 
+PAINTOR15 (https://github.com/gkichaev/PAINTOR_V3.0/wiki)
+FINEMAP16 (http://www.christianbenner.com/)
 Calculate LD matrix:
 plink --bfile ${genotype_data} --extract ${locus_SNP} --a1-allele ${effect_allele} --r square --out ${output_file}
 Finemapping with mcmc model:
 PAINTOR -input {finemapping_list} -in ${input_dir} -Zhead Z -LDname ld -out ${output_dir} -mcmc -annotations Coding
 Finemapping with one causal assumption:
 PAINTOR -input ${finemapping_list} -in ${input_dir} -Zhead Z -LDname ld -out ${output_dir} -enumerate 1 -annotations Coding
+Finemapping with FINEMAP:
+finemap --sss --in-files ${finemapping_list} --dataset ${dataset}
 
 Step8: Polygenic score (PGS)
 Tools: PRSice v.2.3.5 software16 (https://www.prsice.info/)
