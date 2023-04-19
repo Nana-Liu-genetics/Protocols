@@ -21,7 +21,7 @@ Calculate the observed heterozygosity rate per individual using the formula (N(N
 Missing genotypes > 3%
 plink --bfile ${genotype_data} --missing --out ${missingness}
 Principal components analysis (PCA)
-We removed the genomic regions with long-range LD (e.g. MHC region)2,3, which was listed on the website (https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD)).
+We removed the genomic regions with long-range LD (e.g. MHC region), which was listed on the website (https://genome.sph.umich.edu/wiki/Regions_of_high_linkage_disequilibrium_(LD)).
 plink --bfile ${genotype_data} --exclude high-LD-regions.txt --range --make-bed --out ${genotype_data_rm_high-LD}
 plink --bfile ${genotype_data_rm_high-LD} --indep-pairwise 1000 80 0.1 --out ${genotype_data_rm_high-LD}
 plink --bfile ${genotype_data_rm_high-LD} --extract genotype_data_rm_high-LD.prune.in --make-bed --out ${genotype_data_prune}
@@ -52,107 +52,10 @@ segmentHA_T1.sh ${SUBJECT} ${SUBJECTS_DIR}
 
 3. Harmonization
 Tools: ComBat harmonization
-function HAdata=harmonization_ROI(data,batch,covariates,method)
-fprintf('--------HAdata=harmonize multi-batches(centers) ROI data based on Combat---------\n');
-fprintf('Format: HAdata=harmonization_ROI(data,batch,covariates,method)\n');
-fprintf('--data:\tdata need harmonization (mandatory),canbe mat variable, or csv,xls or text file\n');
-fprintf('--batch:\tbatch (center) effects that need be removed(mandatory),vector or text file[Ndatas]\n');
-fprintf('--covariates:\tcovariates of Biological information that need preserved (optional),matrix or text file[Ncovariates,Nsample]\n');
-fprintf('--method;\tharmonization method (optional),''parametric''(default) or ''non-parametric''\n');
-fprintf('-------Written by QinWen 20200707--------\n');
-fprintf('This script depend on ''ComBatHarmonization''(by  Jfortin1) at github:\nhttps://github.com/Jfortin1/ComBatHarmonization/tree/master/Matlab\n');
-if nargin<1
-    data=spm_select(1,'any','Select a text(csv,xls,mat) data file needs harmonization:');
-end
-if nargin<2
-    batch=spm_select(1,'any','Select a text(mat) file defining the batch (center) effect:');
-end
-if nargin<3
-    covariates=spm_select(1,'any','Select a text(mat) file defining the Boilogical covariates:');
-end
-if nargin<4
-    method='parametric';
-end
-%check data
-if ischar(data)
-    if exist(data,'file')
-        data_is_file=1;
-        [outdir,filename,ext]=fileparts(data);
-        switch ext
-            case '.txt'
-                data=load(data);
-            case '.csv'
-                data=csvread(data);
-            case '.xls'
-                data=xlsread(data);
-            case '.xlsx'
-                data=xlsread(data);
-            otherwise
-                data=load(data);
-        end
-    else
-        error('no exist data file %n',data);
-    end
-end
-
-%check batch
-if exist(batch,'file')
-    batch=load(batch);
-    if isstruct(batch)
-        batch=struct2array(batch);
-    end
-elseif exist(batch,'1')
-    batch=batch;
-else
-    error('Bad format of batch \n');
-end
-%check covariates
-if exist(covariates,'file')
-    covariates=load(covariates);
-    if isstruct(covariates)
-        covariates=struct2array(covariates);
-    end
-end
-if isempty(covariates)
-covariates=[];
-end
-
-% maincode
-HAdata=harmonization_run(data,batch,covariates,'',method);
-if ~data_is_file
-    outpath=[pwd,filesep,'harmonized_data.mat'];
-else
-outpath=[outdir,filesep,'Ha_',filename,'.mat'];
-end
-    save(outpath,'HAdata','batch','covariates');
+harmonization_ROI.m
 
 4. Gaussian transformation
-function outdata=gaussian_resmaple_Qin(data,outpath)
-if nargin<2
-    outdir=pwd;
-    outpath=[outdir,filesep,'gauss_data.mat'];
-end
-if nargin<1
-    fprintf('=========resample data into Gaussain distribution=========\nFormat: outdata=gaussian_resmaple(data,outpath)');
-    fprintf('\nInput\n --data: input data [nSample nFeature]\n');
-    fprintf(' --outpath: output filepath(*.mat)\nOutput\n --outdata: output data\n');
-    fprintf('-------Written by Qin Wen at 20190828------\n');
-    return;
-end
-msize=size(data);
-GS=randn(msize(1),1);
-zGS=sort(zscore(GS));
-resamp_data=[];
-for f =1:msize(2)
-    fdata=data(:,f);
-    [ofdata,ind]=sort(fdata);
-    GS_fdata(ind)=zGS;
-    resamp_data(:,f)=GS_fdata;
-end
-outdata.resamp_data=resamp_data;
-outdata.gauss_ref=zGS;
-save(outpath,'-struct','outdata')
-end
+bqw_gaussian_resample.m
 
 Step3: GWAS of hippocampal and subfield volumes
 1. For autosomes
@@ -170,7 +73,7 @@ python plink2metasoft.py ${output_file} ${GWAS summary statistics 1} ${GWAS summ
 java -jar Metasoft.jar -input ${input_file} -mvalue -output ${output_file}
 
 Step5: Plink clumping
-Tools: PLINK1 (http://zzz.bwh.harvard.edu/plink/) 
+Tools: PLINK (http://zzz.bwh.harvard.edu/plink/) 
 plink \
     --bfile ${genotype_data}\
     --clump-p1 1.13e-9 \
